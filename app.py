@@ -61,7 +61,7 @@ Here are some information and key points to remember about Samuel:
 WELCOME_MESSAGE = """
 Welcome! Let me introduce you to Samuel, a talented and passionate student with a strong background in AI and computer science.
 
-**Samuel is looking for a 3 to 4-month internship opportunity** where he can put his skills to good use and gain practical experience. 🌟
+**Samuel is looking for a 4-month internship opportunity** where he can put his skills to good use and gain practical experience. 🌟
 
 He's in his fourth year of software engineering at the renowned Engineering School [INSA Lyon](https://www.insa-lyon.fr/sites/www.insa-lyon.fr/files/plaquette-if-032024.pdf) and is also working towards a master's degree in Artificial Intelligence at the University of Passau in Germany. 🎓
 
