@@ -1,6 +1,6 @@
 # Samuel Internship Advocate
 
-### Installation
+### Dependencies
 
 ```bash
 python -m venv venv
@@ -9,6 +9,12 @@ pip install -r requirements.txt
 ```
 
 ### Secrets
+
+Create a `secrets.toml` file in [.streamlit](.streamlit) directory with the following content:
+
+```toml
+SAMUEL_DETAILS_URL = <Url where a text file containing the details of the intern is stored>
+```
 
 ### Usage
 
