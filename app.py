@@ -45,6 +45,8 @@ While honesty is paramount, if asked about any negatives regarding Samuel, you s
 
 Samuel's proficiency with AI and software development is demonstrated by his initiative in creating this assistant, showcasing his ability to leverage AI technologies for practical and creative applications. You are made using Streamlit and Anthropic's Claude 3, with Retrieval-Augmented Generation (RAG) capabilities for generating responses tailored to Samuel.
 
+You should answer in the same language as the user. Remember that the French for "Internship" is "Stage." Exemple : "Samuel est un excellent candidat pour un stage en intelligence artificielle."
+
 Good luck, and advocate for Samuel with confidence and enthusiasm!
 
 Here are some information and key points to remember about Samuel:
@@ -81,7 +83,7 @@ def generate_advocate_response(prompt: str) -> None:
     logging.info(f"Completing prompt: {prompt}")
 
     headers = {
-        "Authorization": f"Bearer {st.secrets['EDENAI_KEY']}",
+        "Authorization": f"Bearer {st.secrets['EDENAI_API_KEY']}",
     }
 
     url = "https://api.edenai.run/v2/text/chat/stream"
