@@ -13,7 +13,8 @@ pip install -r requirements.txt
 Create a `secrets.toml` file in [.streamlit](.streamlit) directory with the following content:
 
 ```toml
-SAMUEL_DETAILS_URL = <Url where a text file containing the details of the intern is stored>
+ANTHROPIC_API_KEY= "<Get you Anthropic API key from https://www.anthropic.com/api>"
+SAMUEL_DETAILS_URL = "<Url where a text file containing the details of the intern is stored>"
 ```
 
 ### Usage

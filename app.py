@@ -4,12 +4,16 @@ import json
 import requests
 import logging
 from requests.exceptions import RequestException
+from anthropic import Anthropic, Stream
+from anthropic.types import ContentBlockDeltaEvent
 
+# MODEL = "claude-3-haiku-20240307"
+MODEL = "claude-3-sonnet-20240229"
 
 logging.basicConfig(level=logging.INFO)
 
 
-st.set_page_config(page_title="Samuel's Advocate", page_icon="🚀")
+st.set_page_config(page_title="Samuel's Advocate", page_icon="🚀", layout="wide")
 
 
 @st.cache_data
@@ -28,6 +32,14 @@ def get_samuel_details() -> str:
 
 
 SAMUEL_DETAILS = get_samuel_details()
+
+
+@st.cache_resource
+def get_anthropic_client() -> Anthropic:
+    return Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
+
+
+anthropic = get_anthropic_client()
 
 
 SYSTEM_PROMPT = f"""
@@ -71,41 +83,37 @@ What would you like to know more about? Samuel's academic background, his experi
 """
 
 
-def stream_text_from_response(response) -> Generator[str, None, None]:
-    for chunk_response in response.iter_lines():
-        chunk = json.loads(chunk_response.decode())
-        yield chunk["text"]
+def extract_text_from_stream(stream: Stream) -> Generator[str, None, None]:
+    for event in stream:
+        if isinstance(event, ContentBlockDeltaEvent):
+            yield event.delta.text
 
 
-def generate_advocate_response(prompt: str) -> None:
-    logging.info(f"Completing prompt: {prompt}")
-
-    headers = {
-        "Authorization": f"Bearer {st.secrets['EDENAI_KEY']}",
-    }
-
-    url = "https://api.edenai.run/v2/text/chat/stream"
-    payload = {
-        "providers": "openai",
-        "chatbot_global_action": SYSTEM_PROMPT,
-        "temperature": 0.0,
-        "max_tokens": 4096,
-        "text": prompt,
-        "previous_history": st.session_state.messages,
-    }
+def generate_advocate_response(user_message: str) -> None:
+    logging.info(f"Completing prompt: {user_message}")
 
     try:
-        response = requests.post(url, json=payload, headers=headers, stream=True)
-        response.raise_for_status()
-    except RequestException as e:
-        logging.error(f"Failed to complete prompt: {e}")
-        st.error("Request to EdenAI's servers failed. Please try again later.")
+
+        stream = anthropic.messages.create(
+            max_tokens=4096,
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": "<The user has just logged in>"}]
+            + st.session_state.messages,
+            model=MODEL,
+            stream=True,
+        )
+
+    # TODO :  Handle rate limit error
+
+    except Exception as e:
+        logging.error(f"Failed to generate prompt: {e}")
+        st.error("Failed to generate response. Please try again later.")
         return
 
     with st.chat_message("assistant"):
-        msg = st.write_stream(stream_text_from_response(response))
+        msg = st.write_stream(extract_text_from_stream(stream))
 
-    st.session_state.messages.append({"role": "assistant", "message": msg})
+    st.session_state.messages.append({"role": "assistant", "content": msg})
 
     logging.info(f"Prompt completed successfully: {msg}")
 
@@ -129,20 +137,20 @@ if "messages" not in st.session_state:
     st.session_state["messages"] = [
         {
             "role": "assistant",
-            "message": WELCOME_MESSAGE,
+            "content": WELCOME_MESSAGE,
         }
     ]
 
 
 for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["message"])
+    st.chat_message(msg["role"]).write(msg["content"])
 
 
 if prompt := st.chat_input(
     max_chars=500,
     placeholder="What are Samuel's relevant skills and experiences?",
 ):
-    st.session_state.messages.append({"role": "user", "message": prompt})
+    st.session_state.messages.append({"role": "user", "content": prompt})
     st.chat_message("user").write(prompt)
 
     generate_advocate_response(prompt)
