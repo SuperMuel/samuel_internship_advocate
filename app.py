@@ -88,7 +88,7 @@ def generate_advocate_response(prompt: str) -> None:
 
     url = "https://api.edenai.run/v2/text/chat/stream"
     payload = {
-        "providers": "openai",
+        "providers": ["openai/gpt-4o-mini"],
         "chatbot_global_action": SYSTEM_PROMPT,
         "temperature": 0.0,
         "max_tokens": 4096,
